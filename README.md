@@ -55,7 +55,7 @@ exit
 
 7. Halt the demo VM
 ```bash
-( cd vagrant/demo && vagrant destroy )
+( cd vagrant/demo && vagrant halt )
 ```
 
 8. Destroy the demo VM
@@ -126,28 +126,29 @@ Let me know!
 
 ## Known Issues
 
-Mesos
-* Mesos executor is running all jobs as root
-
-Marathon Client
-* -u does not seem to support multiple args
-* -u does not support 302 redirects (as used by github release links)
-
-Jenkins Mesos Plugin
-* Jenkins Framework is requiring 2 CPU's, which is why the demo VM is
-  configured with 4 CPU cores.
-
 General
 * The demo Virtual Machine uses an [INSECURE SSH KEYPAIR](https://github.com/mitchellh/vagrant/tree/master/keys)
 * Mesos `make check` fails non-deterministicly and is disabled
 * Java crashes regularly when running and build with Java 6
 * The Jenkins plugin was recently removed from the Mesos repo and the build
-  process needs to be updated to work with the new location.
+  process needs to be updated to work with the new location
 * Marathon builds are failing on the demo vm... even with this [recent
-  fix](https://github.com/mesosphere/marathon/commit/26d2b8ceb6670bbd2bfd5578f47854373c4c7147) did not address all of the issues.
+  fix](https://github.com/mesosphere/marathon/commit/26d2b8ceb6670bbd2bfd5578f47854373c4c7147) did not address all of the issues
   Perhaps an asset permissions issue?
 * TCP ports `8080` and `5050` are forwarded to the VM and may conflict with
   existing listeners
+
+Mesos
+* Mesos executor is running all jobs as root (yup!! need to figure out how to
+  properly configure this)
+
+Jenkins Mesos Plugin
+* Jenkins Framework is requiring 2 CPU's, which is why the demo VM is
+  configured with 4 CPU cores.
+
+Marathon Client
+* -u does not seem to support multiple args
+* -u does not support 302 redirects (as used by github release links)
 
 ## TODO
 
