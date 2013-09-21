@@ -1,0 +1,55 @@
+#!/bin/bash
+set -o errexit -o nounset -o pipefail
+function -h {
+cat <<USAGE
+ USAGE: mesos-init-wrapper (master|slave)
+
+  Run Mesos in master or slave mode, loading environment files, setting up
+  logging and loading config parameters as appropriate.
+
+USAGE
+}; function --help { -h ;}                 # A nice way to handle -h and --help
+export LC_ALL=en_US.UTF-8                    # A locale that works consistently
+
+function main {
+  err "Please use \`master' or \`slave'."
+}
+
+function slave {
+  local args=()
+  [[ ! -f /etc/default/mesos ]]       || . /etc/default/mesos
+  [[ ! -f /etc/default/mesos-slave ]] || . /etc/default/mesos-slave
+  [[ ! ${ULIMIT:-} ]] || ulimit $ULIMIT
+  [[ ! ${MASTER:-} ]] || args+=( --master="$MASTER" )
+  [[ ! ${LOGS:-} ]]   || args+=( --log_dir="$LOGS" )
+  logged /usr/local/sbin/mesos-slave "${args[@]}"
+}
+
+function master {
+  local args=()
+  [[ ! -f /etc/default/mesos ]]        || . /etc/default/mesos
+  [[ ! -f /etc/default/mesos-master ]] || . /etc/default/mesos-master
+  [[ ! ${ULIMIT:-} ]] || ulimit $ULIMIT
+  [[ ! ${ZK:-} ]]      || args+=( --zk="$ZK" )
+  [[ ! ${PORT:-} ]]    || args+=( --port="$PORT" )
+  [[ ! ${CLUSTER:-} ]] || args+=( --cluster="$CLUSTER" )
+  [[ ! ${LOGS:-} ]]    || args+=( --log_dir="$LOGS" )
+  logged /usr/local/sbin/mesos-master "${args[@]}"
+}
+
+# Send all output to syslog and tag with PID and executable basename.
+function logged {
+  local tag="${1##*/}[$$]"
+  exec 1> >(logger -p user.info -t "$tag")
+  exec 2> >(logger -p user.err  -t "$tag")
+  exec "$@"
+}
+
+function msg { out "$*" >&2 ;}
+function err { local x=$? ; msg "$*" ; return $(( $x == 0 ? 1 : $x )) ;}
+function out { printf '%s\n' "$*" ;}
+
+if [[ ${1:-} ]] && declare -F | cut -d' ' -f3 | fgrep -qx -- "${1:-}"
+then "$@"
+else main "$@"
+fi

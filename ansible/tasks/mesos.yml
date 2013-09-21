@@ -1,0 +1,77 @@
+---
+# tasks/mesos.yml
+# Build and install Mesos from source
+
+- name: mesos | create checkout directory
+  file: state=directory path=${mesos_checkout} owner=vagrant group=vagrant
+
+- name: mesos | checkout
+  git: repo=${mesos_repo} dest=${mesos_checkout} version=${mesos_version}
+  sudo: false
+
+- name: mesos | bootstrap checkout
+  shell: ${mesos_checkout}/bootstrap && touch /var/tmp/mesos_bootstrap
+         chdir=${mesos_checkout} creates=/var/tmp/mesos_bootstrap
+  sudo: false
+
+- name: mesos | create build directory
+  file: state=directory path=${mesos_build} owner=vagrant group=vagrant
+
+- name: mesos | configure (~1min on 2010 dual core MacBook Air)
+  shell: ${mesos_checkout}/configure && touch /var/tmp/mesos_configure
+         chdir=${mesos_build} creates=/var/tmp/mesos_configure
+  sudo: false
+
+- name: mesos | make (~31m on 2010 dual core MacBook Air)
+  shell: ${make} && touch /var/tmp/mesos_make
+         chdir=${mesos_build} creates=/var/tmp/mesos_make
+  sudo: false
+
+## CgroupsIsolatorTest.ROOT_CGROUPS_BalloonFramework test will fail if mesos
+## services are already running. Non-deterministic failures have also been
+## encountered with Java 1.6.
+#- name: mesos | make check (~21m on 2010 dual core MacBook Air)
+#        Non-deterministic failures have been seen at this stage. If it
+#        fails, try again with 'vagrant provision'... :-/ 
+#  shell: ${make} check && touch /var/tmp/mesos_check
+#         chdir=${mesos_build} creates=/var/tmp/mesos_check
+#  sudo: false
+
+# Append stdout directly to log since this step produces a *lot* of
+# output due to the way maven displays download progress.
+- name: mesos | make jenkins plugin (~8m on 2010 dual core MacBook Air)
+  shell: ${make} jenkins >> ${provision_log} && touch /var/tmp/mesos_make_jenkins
+         chdir=${mesos_build}/jenkins creates=/var/tmp/mesos_make_jenkins
+  sudo: false
+
+- name: mesos | make install
+  shell: ${make} install && touch /var/tmp/mesos_make_install
+         chdir=${mesos_build} creates=/var/tmp/mesos_make_install
+
+- name: mesos | ensure dynamic linker run-time bindings are up-to-date
+  command: ldconfig
+
+- name: mesos | defaults
+  template: src=templates/etc_default_mesos.j2
+            dest=/etc/default/mesos
+
+- name: mesos | master defaults
+  template: src=templates/etc_default_mesos-master.j2
+            dest=/etc/default/mesos-master
+
+- name: mesos | slave defaults
+  template: src=templates/etc_default_mesos-slave.j2
+            dest=/etc/default/mesos-slave
+
+- name: mesos | init wrapper
+  copy: src=files/usr_bin_mesos-init-wrapper
+        dest=/usr/bin/mesos-init-wrapper
+        owner=root group=root mode=0755
+
+- name: mesos | master init script
+  copy: src=files/etc_init_mesos-master.conf
+        dest=/etc/init/mesos-master.conf
+
+- name: mesos | slave init script
+  copy: src=files/etc_init_mesos-slave.conf
+        dest=/etc/init/mesos-slave.conf

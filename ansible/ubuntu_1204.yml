@@ -1,0 +1,33 @@
+---
+# Ansible Playbook for Mesos on Ubuntu 12.04 LTS
+- hosts: all
+  user: vagrant
+  sudo: true
+
+  vars_files:
+    - "config.yml"
+
+  tasks:
+    - include: tasks/build_tools.yml
+    - include: tasks/system_tools.yml
+    - include: tasks/java.yml
+    - include: tasks/zookeeper.yml
+    - include: tasks/mesos.yml
+    - include: tasks/marathon.yml
+    - include: tasks/jenkins.yml
+
+    # Use state=restarted due to buggy upstart status handling with ansible 1.1
+    - name: start zookeeper
+      service: name=zookeeper state=restarted enabled=yes
+
+    # Use state=restarted due to buggy upstart status handling with ansible 1.1
+    - name: start mesos master
+      service: name=mesos-master state=restarted enabled=yes
+
+    # Use state=restarted due to buggy upstart status handling with ansible 1.1
+    - name: start mesos slave
+      service: name=mesos-slave state=restarted enabled=yes
+
+    # Use state=restarted due to buggy upstart status handling with ansible 1.1
+    - name: start marathon server
+      service: name=marathon state=restarted enabled=yes

@@ -1,0 +1,21 @@
+---
+# tasks/java.yml
+# Install Java 7 and Java related packages
+
+- name: java | install java 7
+  apt: pkg=openjdk-7-jdk state=latest update_cache=yes
+
+- name: java | install maven
+  apt: pkg=maven state=latest update_cache=yes
+
+- name: java | install scala
+  apt: pkg=scala state=latest update_cache=yes
+
+- name: java | remove ubuntu's java 6 and related packages
+  apt: pkg=$item state=absent update_cache=yes
+  with_items:
+    - openjdk-6-jre
+    - openjdk-6-jre-headless
+    - openjdk-6-jre-lib
+    - icedtea-netx
+    - icedtea-netx-common

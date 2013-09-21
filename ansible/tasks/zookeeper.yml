@@ -1,0 +1,19 @@
+---
+# tasks/zookeeper.yml
+
+- name: zookeeper | install packages
+  apt: pkg=$item state=latest update_cache=yes
+  with_items:
+    - zookeeper
+    - zookeeperd
+    - libzookeeper-mt2
+
+- name: zookeeper | start service for configuration
+  service: name=zookeeper state=started
+
+# TODO: Move this to the Mesos startup process
+- name: zookeeper | create mesos znode
+  shell: ${zookeeper_cli} -server ${zookeeper_host}:${zookeeper_port} create /mesos new
+
+- name: zookeeper | configuration finished, stop service
+  service: name=zookeeper state=stopped

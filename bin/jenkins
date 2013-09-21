@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+set -o errexit -o nounset -o pipefail
+
+function usage() {
+cat <<USAGE
+  *** OLD SCRIPT - NOT CURRENTLY USED BY PLAYA-MESOS ***
+  Helper script to start Jenkins in a Mesos environment.
+
+  OPTIONS:
+    -h              | show help
+    -w jenkins.war  | path to jenkins war (REQUIRED)
+    -o jenkins_home | path to jenkins configuration home (REQUIRED)
+
+  EXAMPLE:
+    ${0} -w ~/jenkins.war -o ~/.jenkins
+
+  ENVIRONMENT VARIABLES:
+    HEAP              | default: 512m
+    JAVA_HOME         |
+    JAVA_LIBRARY_PATH | default: /usr/local/lib:/lib:/usr/lib
+    LD_LIBRARY_PATH   | default: \$JAVA_LIBRARY_PATH
+    PORT              | default: 8080, note: set automatically when
+                      | launched in a mesos cluster via marathon
+USAGE
+}
+
+export JAVA_LIBRARY_PATH="/usr/local/lib:/lib:/usr/lib"
+export LD_LIBRARY_PATH="$JAVA_LIBRARY_PATH"
+
+port=${PORT:-8080} # Default to 8080 if PORT is null or not set
+heap=${HEAP:-512m} # Default to 512m if HEAP is null or not set
+
+# Process command line args
+
+# Reset OPTIND in case getopts has been used previously in the shell
+OPTIND=1
+while getopts ":w:o:h" opt; do
+  case $opt in
+    w  ) jenkins_war=$OPTARG;;
+    o  ) jenkins_home=$OPTARG; export JENKINS_HOME=$OPTARG;;
+    h  ) usage; exit;;
+    \? ) echo "Unknown option: -$OPTARG" >&2; exit 1;;
+    :  ) echo "Missing argument for -$OPTARG" >&2; exit 1;;
+    *  ) echo "Unimplemented option: -$OPTARG" >&2; exit 1;;
+  esac
+done
+
+# Check for required arguments and that files exist
+function check_args() {
+  # TODO: replace check with ${x-} and get rid of set +u, set -u?
+  set +u
+  if [[ -z "$jenkins_war" || -z "$jenkins_home" ]]; then
+    usage
+    exit 1
+  fi
+  set -u
+
+  if [[ ! -d "$jenkins_home" ]]; then
+    echo "ERROR: configuration home (${jenkins_home}) is not a directory" >&2
+    exit 1
+  fi
+
+  if [[ ! -f "$jenkins_war" ]]; then
+    echo "ERROR: war (${jenkins_war}) does not exist" >&2
+    exit 1
+  fi
+}
+
+# Set java variable to the location of the java executable, defaulting first
+# to java found in JAVA_HOME followed by java found in the search path.
+function set_java_path() {
+  set +u
+  if [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
+    java_path="$JAVA_HOME/bin/java"
+  elif type -p java; then
+    java_path=java
+  else
+    echo "ERROR: java not found in \$JAVA_HOME/bin/ or in the search path" >&2
+    exit 1
+  fi
+  set -u
+}
+
+start_jenkins() {
+  echo "Starting Jenkins with heapsize of ${heap} and environment:"
+  env
+  "$java_path" -Xmx"$heap" -Xms"$heap" -jar "$jenkins_war" --httpPort="$port"
+}
+
+check_args
+set_java_path
+start_jenkins

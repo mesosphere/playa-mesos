@@ -1,0 +1,54 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # Every Vagrant virtual environment requires a box to build off of.
+  config.vm.box = "precise64"
+
+  # The url from where the 'config.vm.box' box will be fetched if it
+  # doesn't already exist on the user's system.
+  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. Be sure to not get
+  # guest and host confused.
+  config.vm.network :forwarded_port, guest: 8080, host: 8080
+  config.vm.network :forwarded_port, guest: 5050, host: 5050
+
+  # Create a private network, which allows host-only access to the machine
+  # using a specific IP.
+  # config.vm.network :private_network, ip: "192.168.33.10"
+
+  # Create a public network, which generally matched to bridged network.
+  # Bridged networks make the machine appear as another physical device on
+  # your network.
+  config.vm.network :public_network
+
+  # If true, then any SSH connections made will enable agent forwarding.
+  # Default value: false
+  config.ssh.forward_agent = true
+
+  config.vm.provider :virtualbox do |vb|
+    # Note: You'll want a decent amount of memory for your mesos master/slave
+    # VM. The strict minimum, at least while the VM is provisioned, is the
+    # amount necessary to compile mesos and the jenkins plugin. 2048m+ is
+    # recommended.  The CPU count can be lowered, but you may run into issues
+    # running the Jenkins Mesos Framework if you do so.
+    vb.customize ["modifyvm", :id, "--memory", "2048"]
+    vb.customize ["modifyvm", :id, "--cpus", "4"]
+  end
+
+  config.vm.provision :shell do |shell|
+    shell.path = "../../ansible/bootstrap.sh"
+  end
+
+  config.vm.provision :ansible do |ansible|
+    ansible.extra_vars = { ssh_user: "vagrant" }
+    ansible.playbook = "../../ansible/ubuntu_1204.yml"
+    ansible.sudo = true
+    ansible.verbose = true
+  end
+end

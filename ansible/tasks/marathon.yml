@@ -1,0 +1,34 @@
+---
+# tasks/marathon.yml
+# Install Marathon server and client
+
+- name: marathon | create checkout directory
+  file: state=directory path=${marathon_checkout} owner=vagrant group=vagrant
+
+- name: marathon | check out source
+  git: repo=${marathon_repo} dest=${marathon_checkout} version=${marathon_version}
+  sudo: false
+
+- name: marathon | create install directory
+  file: state=directory path=${marathon_install_dir}
+
+# Marathon currently fails to compile in the virtual machine environment,
+# possibly due to asset permission issues... TODO: Research and replace this
+# pre-compiled version with a proper build.
+- name: marathon | install jar
+  get_url: url=https://github.com/lingmann/playa-mesos/releases/download/0.1.0/marathon-0.0.6-SNAPSHOT-jar-with-dependencies.jar
+           dest=${marathon_install_dir}/marathon.jar
+
+- name: marathon | defaults
+  template: src=templates/etc_default_marathon.j2
+            dest=/etc/default/marathon
+
+- name: marathon | master init script
+  copy: src=files/etc_init_marathon.conf
+        dest=/etc/init/marathon.conf
+
+# Vagrant boxes use a special ruby installation... use it to install gems
+# instead of the ansible gem module (which fails because rubygems is not
+# installed in a standard location.)
+- name: marathon | install marathon_client gem
+  command: /opt/vagrant_ruby/bin/gem install marathon_client -y

@@ -1,0 +1,9 @@
+---
+# tasks/jenkins.yml
+# Install Jenkins WAR
+
+- name: jenkins | create install directory
+  file: state=directory path=${jenkins_install_dir}
+
+- name: jenkins | download jenkins war
+  get_url: url=${jenkins_war} dest=/opt/jenkins/jenkins.war mode=0644
