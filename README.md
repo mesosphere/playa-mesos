@@ -63,11 +63,6 @@ exit
 ( cd vagrant/demo && vagrant halt )
 ```
 
-9. Destroy the demo VM
-```bash
-( cd vagrant/demo && vagrant destroy )
-```
-
 ## Jenkins Mesos Integration
 
 For further information on Jenkins integration with Mesos see [Building a
@@ -75,9 +70,19 @@ framework on Mesos](http://www.youtube.com/watch?v=TPXw_lMTJVk).  Jump to
 16m30s for specifics on how you can enable the Jenkins Mesos Framework and
 create jobs which run on the cluster.
 
-## General Tasks
+## Common Tasks
 
-Re-build the VM without destroying the image
+### Start the demo VM
+```bash
+( cd vagrant/demo && vagrant up )
+```
+
+### Destroy the demo VM
+```bash
+( cd vagrant/demo && vagrant destroy )
+```
+
+### Re-build the VM without destroying the image
 ```bash
 ( cd vagrant/demo && vagrant ssh )
 sudo rm /var/tmp/*
@@ -86,7 +91,7 @@ exit
 ( cd vagrant/demo && vagrant provision )
 ```
 
-Connect to the VM directly with SSH
+### Connect to the VM directly with SSH
 ```bash
 ssh -i ~/.vagrant.d/insecure_private_key -p 2222 vagrant@localhost
 ```
@@ -134,7 +139,7 @@ Let me know!
 General
 * The demo Virtual Machine uses an [INSECURE SSH KEYPAIR](https://github.com/mitchellh/vagrant/tree/master/keys)
 * Mesos `make check` fails non-deterministicly and is disabled
-* Java crashes regularly when running and build with Java 6
+* Java crashes regularly when running/building/unit-testing with Java 6
 * The Jenkins plugin was recently removed from the Mesos repo and the build
   process needs to be updated to work with the new location
 * Marathon builds are failing on the demo vm... even with this [recent
@@ -162,7 +167,7 @@ Marathon Client
 
 * Move to externally driven configuration (~/.playa-mesos)
 * Support using custom SSH keys
-* Create wrapper scripts for managing VM's
+* Create wrapper script for managing VM's
 * Automatically configure Jenkins to use the Mesos Cloud
 * Figure out better ways to compile and link the Jenkins plugin so that it is
   not as dependant on the Mesos build environment (for example, the plugin may
