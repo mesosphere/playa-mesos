@@ -14,6 +14,7 @@ VirtualBox, Vagrant, and Ansible.
 
 * [VirtualBox][VirtualBox] 4.2+
 * [Vagrant][Vagrant] 1.3+
+* [Ansible][Ansible] 1.1+
 * The Internet (at least for the initial build)
 
 ## Quick Start
@@ -107,10 +108,12 @@ This is essentially the same as
 
 ### General failures
 
-Check your environment for the required tools and versions.
+Check your environment for the required tools and versions.  All of these must
+be availabe and in your PATH.
 ```bash
 vagrant --version
 VBoxManage --version
+ansible-playbook --version
 ```
 
 ### The demo build fails part-way through
