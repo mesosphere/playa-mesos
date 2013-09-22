@@ -190,6 +190,7 @@ Marathon Client
 * Provide a way to create a demo VM using packaged components instead of
   building them from scratch when improved packages are available.
 * Add support for CentOS
+* Remove local Ansible requirement by executing ansible within guest
 
 [Mesos]: http://incubator.apache.org/mesos/ "Apache Mesos"
 [Marathon]: http://github.com/mesosphere/marathon "Marathon"
