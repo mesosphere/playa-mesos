@@ -135,6 +135,16 @@ Check the config.vm.provider section of your [Vagrantfile](https://github.com/li
 configuration options](http://www.virtualbox.org/manual/ch06.html).  You may need to adjust or add options depending
 on your network requirements.
 
+### ([Errno 8] Exec format error)
+
+```
+[default] Running provisioner: ansible...
+ERROR: problem running /Users/jlingmann/code/playa-mesos/vagrant/demo/vagrant_ansible_inventory_default --list ([Errno 8] Exec format error)
+Ansible failed to complete successfully. Any error output should be
+visible above. Please fix these errors and try again.
+```
+Remove the execute bit from your inventory file with: `chmod -x vagrant_ansible_inventory_default`
+
 ### Something else?
 
 Let me know!
