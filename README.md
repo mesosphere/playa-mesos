@@ -55,6 +55,10 @@ marathon start \
   --mem=512 \
   --uri="https://s3.amazonaws.com/lingmann/jenkins_config-0.1.0.tgz" \
   --env="JENKINS_HOME=jenkins_config-0.1.0"
+
+# show the jenkins listener address (only accessible if bridging is working and enabled):
+echo http://`facter ipaddress_eth1`:`http http://localhost:8080/v1/endpoints|grep jenkins|cut -d':' -f2`
+
 exit
 ```
 
@@ -66,9 +70,9 @@ exit
 ## Jenkins Mesos Integration
 
 For further information on Jenkins integration with Mesos see [Building a
-framework on Mesos](http://www.youtube.com/watch?v=TPXw_lMTJVk).  Jump to
-16m30s for specifics on how you can enable the Jenkins Mesos Framework and
-create jobs which run on the cluster.
+framework on Mesos](http://www.youtube.com/watch?v=TPXw_lMTJVk). Jump to 16m30s
+for the exact steps necessary to spin up Jenkins slaves using Mesos. The Jenkins
+Marathon job shown in the Quick Start section has the Mesos plugin enabled.
 
 ## Common Tasks
 
