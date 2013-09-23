@@ -49,7 +49,7 @@ disable bridging in the Vagrantfile.
 ```bash
 ( cd vagrant/demo && vagrant ssh )
 marathon start \
-  --identifier="jenkins" \
+  --id="jenkins" \
   --command="java -Xmx512m -Xms512m -jar /opt/jenkins/jenkins.war --httpPort=\$PORT" \
   --cpus=0.5 \
   --mem=512 \
