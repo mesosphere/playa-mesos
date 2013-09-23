@@ -14,7 +14,6 @@ VirtualBox, Vagrant, and Ansible.
 
 * [VirtualBox][VirtualBox] 4.2+
 * [Vagrant][Vagrant] 1.3+
-* [Ansible][Ansible] 1.1+
 * The Internet (at least for the initial build)
 
 ## Quick Start
@@ -26,14 +25,12 @@ Commands below assume that your current working directory is the root of the
 
 2. [Install Vagrant](http://downloads.vagrantup.com/)
 
-3. [Install Ansible](http://www.ansibleworks.com/docs/gettingstarted.html#via-macports-on-os-x)
-
-4. Check that ports 5050 and 8080 are available (used by demo Vagrantfile)
+3. Check that ports 5050 and 8080 are available (used by demo Vagrantfile)
 ```bash
 netstat -an|egrep '(5050|8080)'|egrep LISTEN
 ```
 
-5. Build the demo VM
+4. Build the demo VM
 ```bash
 ( cd vagrant/demo && vagrant up --provision )
 ```
@@ -44,11 +41,11 @@ with a DHCP server available.  Bridging makes it easier to access ports
 allocated by Mesos, however if you would prefer, you can disable bridging in
 the Vagrantfile.
 
-6. Connect to the Mesos Web UI: [http://localhost:5050](http://localhost:5050)
+5. Connect to the Mesos Web UI: [http://localhost:5050](http://localhost:5050)
 
-7. Connect to the Marathon Web UI: [http://localhost:8080](http://localhost:8080)
+6. Connect to the Marathon Web UI: [http://localhost:8080](http://localhost:8080)
 
-8. Start Jenkins on Mesos using the Marathon client
+7. Start Jenkins on Mesos using the Marathon client
 ```bash
 ( cd vagrant/demo && vagrant ssh )
 marathon start \
@@ -61,7 +58,7 @@ marathon start \
 exit
 ```
 
-9. Halt the demo VM
+8. Halt the demo VM
 ```bash
 ( cd vagrant/demo && vagrant halt )
 ```
@@ -113,7 +110,6 @@ be availabe and in your PATH.
 ```bash
 vagrant --version
 VBoxManage --version
-ansible-playbook --version
 ```
 
 ### The demo build fails part-way through
@@ -190,7 +186,6 @@ Marathon Client
 * Provide a way to create a demo VM using packaged components instead of
   building them from scratch when improved packages are available.
 * Add support for CentOS
-* Remove local Ansible requirement by executing ansible within guest
 
 [Mesos]: http://incubator.apache.org/mesos/ "Apache Mesos"
 [Marathon]: http://github.com/mesosphere/marathon "Marathon"

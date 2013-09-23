@@ -41,14 +41,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ["modifyvm", :id, "--cpus", "4"]
   end
 
+  # Make the project root (and ansible code) available to the guest VM.
+  # This allows us to provision directly inside the VM using ansible and
+  # removes the requirement of having ansible installed on the host.
+  config.vm.synced_folder "../../", "/vagrant"
+
   config.vm.provision :shell do |shell|
     shell.path = "../../ansible/bootstrap.sh"
-  end
-
-  config.vm.provision :ansible do |ansible|
-    ansible.extra_vars = { ssh_user: "vagrant" }
-    ansible.playbook = "../../ansible/ubuntu_1204.yml"
-    ansible.sudo = true
-    ansible.verbose = true
   end
 end
