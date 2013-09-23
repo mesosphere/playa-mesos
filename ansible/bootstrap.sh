@@ -22,7 +22,7 @@ function install_ansible() {
 
   # Install ansible
   sudo apt-get update > /dev/null
-  sudo apt-get -y install ansible
+  sudo apt-get -y install ansible 2> /dev/null
 }
 
 function provision() {

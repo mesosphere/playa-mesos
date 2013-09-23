@@ -158,9 +158,8 @@ General
   Perhaps an asset permissions issue?
 * TCP ports `8080` and `5050` are forwarded to the VM and may conflict with
   existing listeners
-* During the initial shell provisioning the warnings `stdin: is not a tty` and
-  `dpkg-preconfigure: unable to re-open stdin: No such file or directory` appear.
-  These are harmless and can be ignored.  See [Vagrant Issue #1674](https://github.com/mitchellh/vagrant/issues/1673)
+* During the initial shell provisioning the warnings `stdin: is not a tty` will
+  appear. This is harmless and can be ignored. See [Vagrant Issue #1674](https://github.com/mitchellh/vagrant/issues/1673)
 
 Mesos
 * Mesos executor is running all jobs as root (yup!! need to figure out how to
