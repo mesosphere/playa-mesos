@@ -23,14 +23,14 @@ Commands below assume that your current working directory is the root of the
 
 1. [Install VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 
-2. [Install Vagrant](http://downloads.vagrantup.com/)
+1. [Install Vagrant](http://downloads.vagrantup.com/)
 
-3. Check that ports 5050 and 8080 are available (used by demo Vagrantfile)
+1. Check that ports 5050 and 8080 are available (used by demo Vagrantfile)
 ```bash
 netstat -an|egrep '(5050|8080)'|egrep LISTEN
 ```
 
-4. Build the demo VM
+1. Build the demo VM
 ```bash
 ( cd vagrant/demo && vagrant up --provision )
 ```
@@ -41,11 +41,11 @@ interface, choose an interface with a DHCP server available.  Bridging makes it
 easier to access ports allocated by Mesos, however if you would prefer, you can
 disable bridging in the Vagrantfile.
 
-5. Connect to the Mesos Web UI: [http://localhost:5050](http://localhost:5050)
+1. Connect to the Mesos Web UI: [http://localhost:5050](http://localhost:5050)
 
-6. Connect to the Marathon Web UI: [http://localhost:8080](http://localhost:8080)
+1. Connect to the Marathon Web UI: [http://localhost:8080](http://localhost:8080)
 
-7. Start Jenkins on Mesos using the Marathon client
+1. Start Jenkins on Mesos using the Marathon client
 ```bash
 ( cd vagrant/demo && vagrant ssh )
 marathon start \
@@ -61,7 +61,7 @@ echo Jenkins Port: `http localhost:8080/v1/endpoints|grep '^jenkins '|cut -d':' 
 exit
 ```
 
-8. Halt the demo VM
+1. Halt the demo VM
 ```bash
 ( cd vagrant/demo && vagrant halt )
 ```
