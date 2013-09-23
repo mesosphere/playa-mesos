@@ -55,10 +55,8 @@ marathon start \
   --mem=512 \
   --uri="https://s3.amazonaws.com/lingmann/jenkins_config-0.1.0.tgz" \
   --env="JENKINS_HOME=jenkins_config-0.1.0"
-
 # show the jenkins listener address (only accessible if bridging is working and enabled):
 echo http://`facter ipaddress_eth1`:`http http://localhost:8080/v1/endpoints|grep jenkins|cut -d':' -f2`
-
 exit
 ```
 
