@@ -35,11 +35,11 @@ netstat -an|egrep '(5050|8080)'|egrep LISTEN
 ( cd vagrant/demo && vagrant up --provision )
 ```
 This will take some time!  Your demo VM is now building and installing Mesos
-from source.  This will take approximately 30 minutes on a 2013 generation
-MacBook Pro.  If prompted for a bridge network interface, choose an interface
-with a DHCP server available.  Bridging makes it easier to access ports
-allocated by Mesos, however if you would prefer, you can disable bridging in
-the Vagrantfile.
+from source on top of a clean Ubuntu 12.04 image.  This will take approximately
+30 minutes on a 2013 generation MacBook Pro.  If prompted for a bridge network
+interface, choose an interface with a DHCP server available.  Bridging makes it
+easier to access ports allocated by Mesos, however if you would prefer, you can
+disable bridging in the Vagrantfile.
 
 5. Connect to the Mesos Web UI: [http://localhost:5050](http://localhost:5050)
 
@@ -158,7 +158,7 @@ General
   Perhaps an asset permissions issue?
 * TCP ports `8080` and `5050` are forwarded to the VM and may conflict with
   existing listeners
-* During the initial shell provisioning the warnings `stdin: is not a tty` will
+* During the initial shell provisioning the warning `stdin: is not a tty` will
   appear. This is harmless and can be ignored. See [Vagrant Issue #1674](https://github.com/mitchellh/vagrant/issues/1673)
 
 Mesos
