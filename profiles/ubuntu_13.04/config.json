@@ -1,4 +1,6 @@
 {
+    "box_name": "playa_mesos_ubuntu_13.04",
+    "box_url": "http://downloads.mesosphere.io/playa-mesos/playa_mesos_ubuntu_13.04.box",
     "ip_address": "10.141.141.10",
     "vm_ram": "2048",
     "vm_cpus": "2",

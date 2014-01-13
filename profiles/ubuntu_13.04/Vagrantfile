@@ -21,10 +21,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # Every Vagrant virtual environment requires a box to build off of.
     override.vm.box = pmconf.box_name
 
-    # Vagrant only retrieves box images from vm.box_url if it does not have a
-    # local copy in ~/.vagrant.d/boxes/$BOX_NAME. These can be removed with the
-    # command: "vagrant box remove $BOX_NAME"
-    override.vm.box_url = pmconf.box_url
+    # There are two levels of caching here.
+    # 1. If pmconf.box_local is set, then the file referenced by pmconf.box_url
+    #    was found in the Packer build path (packer/builds/*.box) and Vagrant's
+    #    vm.box_url is set to that path. To force retrieving the box
+    #    from the URL again, simply remove the Packer builds directory.
+    # 2. Vagrant only retrieves box images from vm.box_url if it does not have
+    #    a local copy in ~/.vagrant.d/boxes/$BOX_NAME. These can be removed
+    #    with the command: "vagrant box remove $BOX_NAME"
+    override.vm.box_url = pmconf.box_local ? pmconf.box_local : pmconf.box_url
 
     # Create a private network, which allows host-only access to the machine
     # using a specific IP.
