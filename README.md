@@ -99,7 +99,7 @@ see [Configuration][15] and the [Packer Documentation][20].
 
 ## Authors
 
-* [Jeremy Lingmann](https://github.com/lingmann)
+* [Jeremy Lingmann](https://github.com/lingmann) ([@lingmann](https://twitter.com/lingmann))
 
 [1]: http://incubator.apache.org/mesos/ "Apache Mesos"
 [2]: http://github.com/mesosphere/marathon "Marathon"
