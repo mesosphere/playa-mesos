@@ -53,7 +53,16 @@ vagrant destroy
 
 ## Building the Mesos box image
 
-With [Packer][9] the Mesos box image can be built completely from source.
+1. Install [Packer][9]
+
+    Installing Packer is not completely automatic. Once you have downloaded and
+    extracted Packer, you must update your search path so that the `packer`
+    executable can be found.
+
+    ```bash
+    # EXAMPLE - MUST BE ADJUSTED FOR LOCAL SYSTEM
+    PATH=$PATH:/path/where/i/extracted/packer/archive/
+    ```
 
 1. Change to the `ubuntu_13.04` profile directory
 ```bash
