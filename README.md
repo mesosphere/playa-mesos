@@ -1,199 +1,123 @@
 # Playa Mesos
 
-Playa Mesos helps you quickly build functional [Mesos][Mesos] environments, complete with
-[Zookeeper][Zookeeper], [Marathon][Marathon], and a sample application or two.  All components are
-checked out from source and built from scratch.  This makes it easy to test the
-latest builds or pin to a stable version.  This project relies heavily on
-VirtualBox, Vagrant, and Ansible.
+[Playa Mesos][8] helps you quickly create [Apache Mesos][1] test environments.
+This project relies on [VirtualBox][5], [Vagrant][6], and an Ubuntu box image
+which has Mesos pre-installed. The box image is downloadable for your
+convenience, but it can also be built from source using [Packer][9].
+
+## Requirements
+
+* [VirtualBox][5] 4.2+
+* [Vagrant][6] 1.3+
+* [Packer][9] 0.5+ (optional)
+
+## Quick Start
+
+1. [Install VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+
+1. [Install Vagrant](http://www.vagrantup.com/downloads.html)
+
+1. Make sure tests pass
+```bash
+bin/test
+```
+
+1. Change to the `ubuntu_13.04` profile directory
+```bash
+cd profiles/ubuntu_13.04
+```
+
+1. Start the VM
+```bash
+vagrant up
+```
+
+1. Connect to the Mesos Web UI on [10.141.141.10:5050](http://10.141.141.10:5050)
+
+1. SSH to the VM
+```bash
+vagrant ssh
+ps -eaf | grep mesos
+exit
+```
+
+1. Halt the VM
+```bash
+vagrant halt
+```
+
+1. Destroy the VM
+```bash
+vagrant destroy
+```
+
+## Building the Mesos box image
+
+With [Packer][9] the Mesos box image can be built completely from source.
+
+1. Change to the `ubuntu_13.04` profile directory
+```bash
+cd profiles/ubuntu_13.04
+```
+
+1. Destroy any existing VM
+```bash
+vagrant destroy
+```
+
+1. Build the Vagrant box image
+```bash
+./build
+```
+
+1. Start the VM using the local box image
+```bash
+vagrant up
+```
+
+The build is controlled with the following files:
+
+* [profiles/ubuntu_13.04/config.json][21]
+* [profiles/ubuntu_13.04/packer/packer.json][22]
+* [lib/scripts/*][23]
+
+For additional information on customizing the build, or creating a new profile,
+see [Configuration][15] and the [Packer Documentation][20].
+
+## Documentation
+
+* [Configuration][15]
+* [Common Tasks][16]
+* [Troubleshooting][17]
+* [Known Issues][18]
+* [To Do][19]
+
+## Similar Projects
+
+* [vagrant-mesos](https://github.com/everpeace/vagrant-mesos): Vagrant
+  provisiong with multinode and EC2 support
 
 ## Authors
 
 * [Jeremy Lingmann](https://github.com/lingmann)
 
-## Requirements
-
-* [VirtualBox][VirtualBox] 4.2+
-* [Vagrant][Vagrant] 1.3+
-* The Internet (at least for the initial build)
-
-## Quick Start
-
-Commands below assume that your current working directory is the root of the
-[Playa Mesos][Playa Mesos] checkout and VirtualBox is running on `localhost`.
-
-1. [Install VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-
-1. [Install Vagrant](http://downloads.vagrantup.com/)
-
-1. Check that ports 5050 and 8080 are available (used by demo Vagrantfile)
-```bash
-netstat -an|egrep '(5050|8080)'|egrep LISTEN
-```
-
-1. Build the demo VM
-```bash
-( cd vagrant/demo && vagrant up --provision )
-```
-This will take some time!  Your demo VM is now building and installing Mesos
-from source on top of a clean Ubuntu 12.04 image.  This will take approximately
-30 minutes on a 2013 generation MacBook Pro.  If prompted for a bridge network
-interface, choose an interface with a DHCP server available.  Bridging makes it
-easier to access ports allocated by Mesos, however if you would prefer, you can
-disable bridging in the Vagrantfile.
-
-1. Connect to the Mesos Web UI: [http://localhost:5050](http://localhost:5050)
-
-1. Connect to the Marathon Web UI: [http://localhost:8080](http://localhost:8080)
-
-1. Start Jenkins on Mesos using the Marathon client
-```bash
-( cd vagrant/demo && vagrant ssh )
-marathon start \
-  --id="jenkins" \
-  --command="java -Xmx512m -Xms512m -jar /opt/jenkins/jenkins.war --httpPort=\$PORT" \
-  --cpus=0.5 \
-  --mem=512 \
-  --uri="https://s3.amazonaws.com/lingmann/jenkins_config-0.1.0.tgz" \
-  --env="JENKINS_HOME=jenkins_config-0.1.0"
-# show job listener info (only accessible if bridging is working and enabled):
-echo Bridge Interface Address: `facter ipaddress_eth1`
-echo Jenkins Port: `http localhost:8080/v1/endpoints|grep '^jenkins '|cut -d':' -f2`
-exit
-```
-
-1. Halt the demo VM
-```bash
-( cd vagrant/demo && vagrant halt )
-```
-
-## Jenkins Mesos Integration
-
-For further information on Jenkins integration with Mesos see [Building a
-framework on Mesos](http://www.youtube.com/watch?v=TPXw_lMTJVk). Jump to 16m30s
-for the exact steps necessary to spin up Jenkins slaves using Mesos. The Jenkins
-Marathon job shown in the Quick Start section has the Mesos plugin enabled.
-
-## Common Tasks
-
-### Start the demo VM
-```bash
-( cd vagrant/demo && vagrant up )
-```
-
-### Destroy the demo VM
-```bash
-( cd vagrant/demo && vagrant destroy )
-```
-
-### Re-build the VM without destroying the image
-```bash
-( cd vagrant/demo && vagrant ssh )
-sudo rm /var/tmp/*
-sudo rm -rf /usr/local/src/*
-exit
-( cd vagrant/demo && vagrant provision )
-```
-
-### Connect to the VM directly with SSH
-```bash
-ssh -i ~/.vagrant.d/insecure_private_key -p 2222 vagrant@localhost
-```
-
-This is essentially the same as
-```bash
-( cd vagrant/demo && vagrant ssh )
-```
-
-## Troubleshooting
-
-### General failures
-
-Check your environment for the required tools and versions.  All of these must
-be availabe and in your PATH.
-```bash
-vagrant --version
-VBoxManage --version
-```
-
-### The demo build fails part-way through
-
-Verify Internet connectivity from within the Virtual Machine.
-```bash
-( cd vagrant/demo && vagrant up && vagrant ssh )
-ping www.google.com
-exit
-```
-And try to re-provision.
-```bash
-( cd vagrant/demo && vagrant provision )
-```
-
-### Internet or network connectivity issues
-
-Check the config.vm.provider section of your [Vagrantfile](https://github.com/lingmann/playa-mesos/blob/master/vagrant/demo/Vagrantfile) for [VirtualBox network
-configuration options](http://www.virtualbox.org/manual/ch06.html).  You may need to adjust or add options depending
-on your network requirements.
-
-### ([Errno 8] Exec format error)
-
-```
-[default] Running provisioner: ansible...
-ERROR: problem running /Users/jlingmann/code/playa-mesos/vagrant/demo/vagrant_ansible_inventory_default --list ([Errno 8] Exec format error)
-Ansible failed to complete successfully. Any error output should be
-visible above. Please fix these errors and try again.
-```
-Remove the execute bit from your inventory file with: `chmod -x vagrant_ansible_inventory_default`
-
-### Something else?
-
-Let me know!
-
-## Known Issues
-
-General
-* The demo Virtual Machine uses an [INSECURE SSH KEYPAIR](https://github.com/mitchellh/vagrant/tree/master/keys)
-* Mesos `make check` fails non-deterministicly and is disabled
-* Java crashes regularly when running/building/unit-testing with Java 6
-* The Jenkins plugin was recently removed from the Mesos repo and the build
-  process needs to be updated to work with the new location
-* Marathon builds are failing on the demo vm... even with this [recent
-  fix](https://github.com/mesosphere/marathon/commit/26d2b8ceb6670bbd2bfd5578f47854373c4c7147) did not address all of the issues
-  Perhaps an asset permissions issue?
-* TCP ports `8080` and `5050` are forwarded to the VM and may conflict with
-  existing listeners
-* During the initial shell provisioning the warning `stdin: is not a tty` will
-  appear. This is harmless and can be ignored. See [Vagrant Issue #1674](https://github.com/mitchellh/vagrant/issues/1673)
-
-Mesos
-* Mesos executor is running all jobs as root (yup!! need to figure out how to
-  properly configure this)
-
-Jenkins Mesos Plugin
-* Jenkins Framework is requiring 2 CPU's, which is why the demo VM is
-  configured with 4 CPU cores.
-
-Marathon Client
-* -u does not seem to support multiple args
-* -u does not support 302 redirects (as used by github release links)
-
-## TODO
-
-* Move to externally driven configuration (~/.playa-mesos)
-* Support using custom SSH keys
-* Create wrapper script for managing VM's
-* Automatically configure Jenkins to use the Mesos Cloud
-* Figure out better ways to compile and link the Jenkins plugin so that it is
-  not as dependant on the Mesos build environment (for example, the plugin may
-  have mesos libraries linking to libunwind.so...)
-* Provide a way to create a demo VM using packaged components instead of
-  building them from scratch when improved packages are available.
-* Add support for CentOS
-
-[Mesos]: http://incubator.apache.org/mesos/ "Apache Mesos"
-[Marathon]: http://github.com/mesosphere/marathon "Marathon"
-[Jenkins]: http://jenkins-ci.org/ "Jenkins"
-[Zookeeper]: http://zookeeper.apache.org/ "Apache Zookeeper"
-[VirtualBox]: http://www.virtualbox.org/ "VirtualBox"
-[Vagrant]: http://www.vagrantup.com/ "Vagrant"
-[Ansible]: http://www.ansibleworks.com "Ansible"
-[Playa Mesos]: http://github.com/lingmann/playa-mesos "Playa Mesos"
+[1]: http://incubator.apache.org/mesos/ "Apache Mesos"
+[2]: http://github.com/mesosphere/marathon "Marathon"
+[3]: http://jenkins-ci.org/ "Jenkins"
+[4]: http://zookeeper.apache.org/ "Apache Zookeeper"
+[5]: http://www.virtualbox.org/ "VirtualBox"
+[6]: http://www.vagrantup.com/ "Vagrant"
+[7]: http://www.ansibleworks.com "Ansible"
+[8]: http://github.com/lingmann/playa-mesos "Playa Mesos"
+[9]: http://www.packer.io "Packer"
+[13]: http://mesosphere.io/downloads "Mesosphere Downloads"
+[14]: http://www.ubuntu.com "Ubuntu"
+[15]: doc/config.md "Configuration"
+[16]: doc/common_tasks.md "Common Tasks"
+[17]: doc/troubleshooting.md "Troubleshooting"
+[18]: doc/known_issues.md "Known Issues"
+[19]: doc/to_do.md "To Do"
+[20]: http://www.packer.io/docs "Packer Documentation"
+[21]: profiles/ubuntu_13.04/config.json "config.json"
+[22]: profiles/ubuntu_13.04/packer/packer.json "packer.json"
+[23]: lib/scripts "scripts"
