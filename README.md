@@ -108,7 +108,7 @@ see [Configuration][15] and the [Packer Documentation][20].
 [5]: http://www.virtualbox.org/ "VirtualBox"
 [6]: http://www.vagrantup.com/ "Vagrant"
 [7]: http://www.ansibleworks.com "Ansible"
-[8]: http://github.com/lingmann/playa-mesos "Playa Mesos"
+[8]: https://github.com/mesosphere/playa-mesos "Playa Mesos"
 [9]: http://www.packer.io "Packer"
 [13]: http://mesosphere.io/downloads "Mesosphere Downloads"
 [14]: http://www.ubuntu.com "Ubuntu"
