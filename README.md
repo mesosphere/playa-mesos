@@ -9,6 +9,7 @@ convenience, but it can also be built from source using [Packer][9].
 
 * [VirtualBox][5] 4.2+
 * [Vagrant][6] 1.3+
+* [git](http://git-scm.com/downloads) (command line tool)
 * [Packer][9] 0.5+ (optional)
 
 ## Quick Start
@@ -16,6 +17,12 @@ convenience, but it can also be built from source using [Packer][9].
 1. [Install VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 
 1. [Install Vagrant](http://www.vagrantup.com/downloads.html)
+
+1. Clone this repository
+```bash
+git clone https://github.com/mesosphere/playa-mesos.git
+cd playa-mesos
+```
 
 1. Make sure tests pass
 ```bash
@@ -51,18 +58,17 @@ vagrant halt
 vagrant destroy
 ```
 
-## Building the Mesos box image
+## Building the Mesos box image (optional)
 
 1. Install [Packer][9]
 
     Installing Packer is not completely automatic. Once you have downloaded and
     extracted Packer, you must update your search path so that the `packer`
     executable can be found.
-
-    ```bash
-    # EXAMPLE - MUST BE ADJUSTED FOR LOCAL SYSTEM
-    PATH=$PATH:/path/where/i/extracted/packer/archive/
-    ```
+```bash
+# EXAMPLE - PACKER LOCATION MUST BE ADJUSTED
+PATH=$PATH:/path/where/i/extracted/packer/archive/
+```
 
 1. Change to the `ubuntu_13.04` profile directory
 ```bash
