@@ -1,5 +1,6 @@
 require 'json'
 require 'pathname'
+require 'uri'
 
 class PlayaSettings
   attr_reader :settings_file
