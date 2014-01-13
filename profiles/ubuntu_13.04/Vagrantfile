@@ -42,13 +42,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ['modifyvm', :id, '--memory', pmconf.vm_ram]
     vb.customize ['modifyvm', :id, '--cpus',   pmconf.vm_cpus]
 
-    # Make the project root (and ansible code) available to the guest VM.
-    # This allows us to provision directly inside the VM using ansible and
-    # removes the requirement of having ansible installed on the host.
-    config.vm.synced_folder "../../", "/vagrant"
+    # Make the project root available to the guest VM.
+    override.vm.synced_folder '../../', '/vagrant'
 
-    config.vm.provision :shell do |shell|
-      shell.path = "../../ansible/bootstrap.sh"
+    # Only provision if explicitly request with 'provision' or 'up --provision'
+    if ARGV.any? { |arg| arg =~ /^(--)?provision$/ }
+      override.vm.provision :shell do |shell|
+        shell.path = '../../lib/scripts/common/mesosflexinstall'
+        shell.args = "--deb #{pmconf.mesos_deb_url}"
+      end
     end
 
   end
