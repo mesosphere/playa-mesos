@@ -1,0 +1,139 @@
+#!/bin/bash
+set -o errexit -o nounset -o pipefail
+function -h {
+cat <<USAGE
+ USAGE: mesosflexinstall (--deb <URL>)? (--rel <mesos-version>)?
+
+  Install and configure Mesos with Zookeeper support.
+
+USAGE
+}; function --help { -h ;}
+
+
+function main {
+  options "$@"
+  install_mesos
+}
+
+function globals {
+  export LC_ALL=en_US.UTF-8
+  mesos_version=0.15.0-rc4
+  root=http://downloads.mesosphere.io/master
+}; globals
+
+# Calls a function of the same name for each needed variable.
+function global {
+  for arg in "$@"
+  do [[ ${!arg+isset} ]] || eval "$arg="'"$('"$arg"')"'
+  done
+}
+
+function options {
+  while [[ ${1:+isset} ]]
+  do
+    case "$1" in
+      --rel)      mesos_version="$2" ; shift ;;
+      --deb)      deb_url="$2" ; shift ;;  # Overrides default calculated below
+      --*)        err "No such option: $1" ;;
+    esac
+    shift
+  done
+}
+
+function install_mesos {
+  global os_release
+  case "$os_release" in
+    ubuntu/*|debian/*) install_with_apt ;; 
+    *)                 err "No support for $os_release at this time." ;;
+  esac
+}
+
+function install_with_apt {
+  apt_ curl unzip
+  get_deb
+  as_root env DEBIAN_FRONTEND=noninteractive dpkg -i "${deb_url##*/}"
+  apt_ zookeeperd zookeeper zookeeper-bin
+}
+
+function get_deb {
+  global deb_url
+  download=( curl -sSfLO "$deb_url" )
+  if "${download[@]}" 
+  then :
+  else err "${download[@]}" '-$?>' "$?"
+  fi
+}
+
+function deb_url {
+  global os_release
+  out "$root"/"$os_release"/mesos_"$mesos_version"_amd64.deb
+}
+
+function apt_ {
+  as_root env DEBIAN_FRONTEND=noninteractive aptitude update
+  as_root env DEBIAN_FRONTEND=noninteractive aptitude install -y "$@"
+}
+
+function as_root {
+  if [[ $(id -u) = 0 ]]
+  then "$@"
+  else sudo "$@"
+  fi
+}
+
+function os_release {
+  msg "Trying /etc/os-release..."
+  if [[ -f /etc/os-release ]]
+  then
+    ( source /etc/os-release && display_version "$ID" "$VERSION_ID" )
+    return 0
+  fi
+  msg "Trying /etc/redhat-release..."
+  if [[ -f /etc/redhat-release ]]
+  then
+    # Seems to be formatted as: <distro> release <version> (<remark>)
+    #                           CentOS release 6.3 (Final)
+    if [[ $(cat /etc/redhat-release) =~ \
+          ^(.+)' '+release' '+([^ ]+)' '+'('[^')']+')'$ ]]
+    then
+      local os
+      case "${BASH_REMATCH[1]}" in
+        'Red Hat '*) os=RedHat ;;
+        *)           os="${BASH_REMATCH[1]}" ;;
+      esac
+      display_version "$os" "${BASH_REMATCH[2]}"
+      return 0
+    else
+      err "/etc/redhat-release not like: <distro> release <version> (<remark>)"
+    fi
+  fi
+  if which sw_vers &> /dev/null
+  then
+    local product="$(sw_vers -productName)"
+    case "$product" in
+      'Mac OS X') display_version MacOSX "$(sw_vers -productVersion)" ;;
+      *) err "Expecting productName to be 'Mac OS X', not '$product'!";;
+    esac
+    return 0
+  fi
+  err "Could not determine OS version!"
+}
+
+function display_version {
+  local os="$( tr A-Z a-z <<<"$1" )" version="$( tr A-Z a-z <<<"$2" )"
+  case "$os" in
+    redhat|centos|debian) out "$os/${version%%.*}" ;;   # Ignore minor versions
+    macosx)               out "$os/${version%.*}" ;;  # Ignore bug fix releases
+    *)                    out "$os/$version" ;;
+  esac
+}
+
+function msg { out "$*" >&2 ;}
+function err { local x=$? ; msg "$*" ; return $(( $x == 0 ? 1 : $x )) ;}
+function out { printf '%s\n' "$*" ;}
+
+if [[ ${1:-} ]] && declare -F | cut -d' ' -f3 | fgrep -qx -- "${1:-}"
+then "$@"
+else main "$@"
+fi
+
