@@ -67,7 +67,7 @@ vagrant destroy
     executable can be found.
 ```bash
 # EXAMPLE - PACKER LOCATION MUST BE ADJUSTED
-PATH=$PATH:/path/where/i/extracted/packer/archive/
+export PATH=$PATH:/path/where/i/extracted/packer/archive/
 ```
 
 1. Change to the `ubuntu_13.04` profile directory
