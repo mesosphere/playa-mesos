@@ -80,7 +80,7 @@
       "type": "shell"
     },
     {
-      "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}' --deb {{user `mesos_deb_url`}}",
+      "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}' --deb {{user `mesos_deb_url`}} --slave-hostname {{user `ip_address`}}",
       "scripts": [
         "{{user `scripts`}}/common/mesosflexinstall"
       ],

@@ -2,7 +2,9 @@
 set -o errexit -o nounset -o pipefail
 function -h {
 cat <<USAGE
- USAGE: mesosflexinstall (--deb <URL>)? (--rel <mesos-version>)?
+ USAGE: mesosflexinstall (--deb <URL>)?
+                         (--rel <mesos-version>)?
+                         (--slave-hostname <SLAVE_HOSTNAME>)?
 
   Install and configure Mesos with Zookeeper support.
 
@@ -13,6 +15,7 @@ USAGE
 function main {
   options "$@"
   install_mesos
+  configure_slave
 }
 
 function globals {
@@ -32,9 +35,10 @@ function options {
   while [[ ${1:+isset} ]]
   do
     case "$1" in
-      --rel)      mesos_version="$2" ; shift ;;
-      --deb)      deb_url="$2" ; shift ;;  # Overrides default calculated below
-      --*)        err "No such option: $1" ;;
+      --rel)            mesos_version="$2"       ; shift ;;
+      --deb)            deb_url="$2"             ; shift ;; # Overrides default
+      --slave-hostname) slave_hostname="$2"      ; shift ;; # See: MESOS-825
+      --*)              err "No such option: $1" ;;
     esac
     shift
   done
@@ -46,6 +50,14 @@ function install_mesos {
     ubuntu/*|debian/*) install_with_apt ;; 
     *)                 err "No support for $os_release at this time." ;;
   esac
+}
+
+function configure_slave {
+  if [[ ${slave_hostname+isset} ]]
+  then
+    mkdir -p /etc/mesos-slave
+    echo "$slave_hostname" > /etc/mesos-slave/hostname
+  fi
 }
 
 function install_with_apt {
