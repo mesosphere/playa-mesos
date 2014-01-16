@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+set -e
+set -u
+
+MESOS_RELEASE=0.15.0
+IP_ADDRESS=10.141.141.10
+AURORA_REPO=https://github.com/apache/incubator-aurora.git
+
+# This script is a very rough attempt to get the Aurora framework installed
+# and working on playa-mesos. It is a very hacky merge of two scripts
+# from the $AURORA_REPO and should not be used for anything other than
+# experimentation. The scripts copied are:
+#   - examples/vagrant/provision-dev-environment.sh
+#   - examples/vagrant/provision-aurora-scheduler.sh
+
+apt-get update
+apt-get -y install \
+    git automake libtool g++ default-jre default-jdk curl \
+    python-dev libsasl2-dev libcurl4-openssl-dev \
+    make curl
+
+if [ ! -d aurora ]; then
+  echo Cloning aurora repo
+  git clone "$AURORA_REPO" aurora
+fi
+
+pushd aurora
+  AURORA_VERSION=$(cat .auroraversion | tr '[a-z]' '[A-Z]')
+  mkdir -p third_party
+  pushd third_party
+    wget -c "http://downloads.mesosphere.io/master/ubuntu/13.04/mesos_${MESOS_RELEASE}_amd64.egg" \
+      -O "mesos-${MESOS_RELEASE}-py2.7-linux-x86_64.egg"
+  popd
+  git pull
+
+  # build scheduler
+  ./gradlew distTar
+
+  # build clients
+  echo "Building Aurora clients"
+  ./pants src/main/python/apache/aurora/client/bin:aurora_admin
+  ./pants src/main/python/apache/aurora/client/bin:aurora_client
+
+  # fixup python build deps (currently hard-coded to 0.15.0-rc4)
+  # this is required for the executors/observers to build
+  sed -r --in-place "s/(mesos-core.*)([0-9]+\.[0-9]+\.[0-9]+)+(-rc[0-9]+)?/\1${MESOS_RELEASE}/g;" src/main/python/apache/aurora/BUILD.thirdparty
+
+  # build executors/observers
+  echo "Building Aurora executors/observers"
+  ./pants src/main/python/apache/aurora/executor/bin:gc_executor
+  ./pants src/main/python/apache/aurora/executor/bin:thermos_executor
+  ./pants src/main/python/apache/aurora/executor/bin:thermos_runner
+  ./pants src/main/python/apache/thermos/observer/bin:thermos_observer
+
+  # package runner w/in executor
+  python <<EOF
+import contextlib
+import zipfile
+with contextlib.closing(zipfile.ZipFile('dist/thermos_executor.pex', 'a')) as zf:
+  zf.writestr('apache/aurora/executor/resources/__init__.py', '')
+  zf.write('dist/thermos_runner.pex', 'apache/aurora/executor/resources/thermos_runner.pex')
+EOF
+
+  mkdir -p ~/dist/distributions
+  cp dist/distributions/aurora-scheduler-$AURORA_VERSION.tar ~/dist/distributions
+
+  for pex in aurora_admin aurora_client gc_executor thermos_executor thermos_observer; do
+    cp dist/$pex.pex ~/dist
+  done
+popd
+
+sudo chown -R vagrant:vagrant aurora
+
+tar xvf ~/dist/distributions/aurora-scheduler-$AURORA_VERSION.tar -C /usr/local
+install -m 755 ~/dist/aurora_client.pex /usr/local/bin/aurora
+install -m 755 ~/dist/aurora_admin.pex /usr/local/bin/aurora_admin
+
+AURORA_SCHEDULER_HOME=/usr/local/aurora-scheduler-$AURORA_VERSION
+cat > /usr/local/sbin/aurora-scheduler.sh <<EOF
+#!/usr/bin/env bash
+# An example scheduler launch script that works with the included Vagrantfile.
+
+# Flags that control the behavior of the JVM.
+JAVA_OPTS=(
+  -server
+  -Xmx1g
+  -Xms1g
+
+  # Location of libmesos-0.15.0.so / libmesos-0.15.0.dylib
+  -Djava.library.path=/usr/local/lib
+)
+
+# Flags control the behavior of the Aurora scheduler.
+# For a full list of available flags, run bin/aurora-scheduler -help
+AURORA_FLAGS=(
+  -cluster_name=example
+
+  # Ports to listen on.
+  -http_port=8081
+  -thrift_port=8082
+
+  -native_log_quorum_size=1
+
+  -zk_endpoints="${IP_ADDRESS}:2181"
+  -mesos_master_address="zk://${IP_ADDRESS}:2181/mesos/master"
+
+  -serverset_path=/aurora/scheduler
+
+  -native_log_zk_group_path=/aurora/replicated-log
+
+  -native_log_file_path="$AURORA_SCHEDULER_HOME/db"
+  -backup_dir="$AURORA_SCHEDULER_HOME/backups"
+
+  -thermos_executor_path=/usr/local/bin/thermos_executor
+  -gc_executor_path=/usr/local/bin/gc_executor
+
+  -vlog=INFO
+  -logtostderr
+)
+
+# Environment variables control the behavior of the Mesos scheduler driver (libmesos).
+export GLOG_v=0
+export LIBPROCESS_PORT=8083
+export LIBPROCESS_IP="$IP_ADDRESS"
+
+(
+  while true
+  do
+    JAVA_OPTS="\${JAVA_OPTS[*]}" exec "$AURORA_SCHEDULER_HOME/bin/aurora-scheduler" \\
+      "\${AURORA_FLAGS[@]}"
+  done
+) &
+EOF
+chmod +x /usr/local/sbin/aurora-scheduler.sh
+
+mkdir -p /etc/aurora
+cat > /etc/aurora/clusters.json <<EOF
+[{
+  "name": "example",
+  "zk": "$IP_ADDRESS",
+  "scheduler_zk_path": "/aurora/scheduler",
+  "auth_mechanism": "UNAUTHENTICATED"
+}]
+EOF
+
+cat > /etc/rc.local <<EOF
+#!/bin/sh -e
+/usr/local/sbin/aurora-scheduler.sh \
+  1> /var/log/aurora-scheduler-stdout.log \
+  2> /var/log/aurora-scheduler-stderr.log
+EOF
+chmod +x /etc/rc.local
+
+/etc/rc.local

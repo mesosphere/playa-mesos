@@ -60,6 +60,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # TODO: Set as array directly when Vagrant 1.3 support is dropped
         shell.args = arg_array.join(' ')
       end
+      override.vm.provision :shell do |shell|
+        shell.path = '../../lib/scripts/common/aurora'
+      end
     end
 
   end
