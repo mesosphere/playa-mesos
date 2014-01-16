@@ -102,7 +102,7 @@ AURORA_FLAGS=(
   -native_log_quorum_size=1
 
   -zk_endpoints="${IP_ADDRESS}:2181"
-  -mesos_master_address="zk://${IP_ADDRESS}:2181/mesos/master"
+  -mesos_master_address="zk://${IP_ADDRESS}:2181/mesos"
 
   -serverset_path=/aurora/scheduler
 
