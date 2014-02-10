@@ -4,5 +4,5 @@
     "ip_address": "10.141.141.10",
     "vm_ram": "2048",
     "vm_cpus": "2",
-    "mesos_deb_url": "http://downloads.mesosphere.io/master/ubuntu/13.04/mesos_0.15.0_amd64.deb"
+    "mesos_deb_url": "http://downloads.mesosphere.io/master/ubuntu/13.04/mesos_0.16.0_amd64.deb"
 }
