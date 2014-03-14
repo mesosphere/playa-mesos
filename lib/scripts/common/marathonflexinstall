@@ -1,0 +1,166 @@
+#!/bin/bash
+set -o errexit -o nounset -o pipefail
+function -h {
+cat <<USAGE
+ USAGE: marathonflexinstall (--tgz <URL>)?
+                            (--rel <marathon-version>)?
+
+  Install and configure Marathon framework.
+
+USAGE
+}; function --help { -h ;}
+
+
+function main {
+  options "$@"
+  install_marathon
+  install_init
+  as_root service marathon restart
+}
+
+function globals {
+  export LC_ALL=en_US.UTF-8
+  marathon_version=0.5.0-SNAPSHOT
+  root=http://downloads.mesosphere.io/marathon/master
+}; globals
+
+# Calls a function of the same name for each needed variable.
+function global {
+  for arg in "$@"
+  do [[ ${!arg+isset} ]] || eval "$arg="'"$('"$arg"')"'
+  done
+}
+
+function options {
+  while [[ ${1:+isset} ]]
+  do
+    case "$1" in
+      --rel)            marathon_version="$2"    ; shift ;;
+      --tgz)            tgz_url="$2"             ; shift ;; # Overrides default
+      --*)              err "No such option: $1" ;;
+    esac
+    shift
+  done
+}
+
+function install_marathon {
+  global os_release
+  case "$os_release" in
+    ubuntu/*|debian/*) install_tgz ;;
+    *)                 err "No support for $os_release at this time." ;;
+  esac
+}
+
+function install_tgz {
+  apt_ curl
+  get_tgz
+  filename="${tgz_url##*/}"                         # extract filename from url
+  release="${filename%.*}"                                # strip the extension
+  install_dir=/opt/"$release"
+  temp_dir=$(mktemp -d)
+  tar xzvf "$filename" -C "$temp_dir"
+  pushd "$temp_dir"/marathon*               # path may contain a version string
+  bin/build-distribution                            # create the executable jar
+  as_root mkdir -p "$install_dir"
+  as_root install -m 0755 target/marathon-runnable.jar "$install_dir"/marathon.jar
+  as_root rm -rf /opt/marathon
+  as_root ln -s "$install_dir" /opt/marathon
+  popd
+}
+
+function install_init {
+as_root tee /etc/init/marathon.conf <<EOF
+description "Marathon scheduler for Mesos"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+respawn
+respawn limit 10 5
+
+exec /opt/marathon/marathon.jar
+EOF
+}
+
+function get_tgz {
+  global tgz_url
+  download=( curl -sSfLO "$tgz_url" )
+  if "${download[@]}"
+  then :
+  else err "${download[@]}" '-$?>' "$?"
+  fi
+}
+
+function tgz_url {
+  global os_release
+  out "$root"/marathon-"$marathon_version".tgz
+}
+
+function apt_ {
+  as_root env DEBIAN_FRONTEND=noninteractive aptitude update
+  as_root env DEBIAN_FRONTEND=noninteractive aptitude install -y "$@"
+}
+
+function as_root {
+  if [[ $(id -u) = 0 ]]
+  then "$@"
+  else sudo "$@"
+  fi
+}
+
+function os_release {
+  msg "Trying /etc/os-release..."
+  if [[ -f /etc/os-release ]]
+  then
+    ( source /etc/os-release && display_version "$ID" "$VERSION_ID" )
+    return 0
+  fi
+  msg "Trying /etc/redhat-release..."
+  if [[ -f /etc/redhat-release ]]
+  then
+    # Seems to be formatted as: <distro> release <version> (<remark>)
+    #                           CentOS release 6.3 (Final)
+    if [[ $(cat /etc/redhat-release) =~ \
+          ^(.+)' '+release' '+([^ ]+)' '+'('[^')']+')'$ ]]
+    then
+      local os
+      case "${BASH_REMATCH[1]}" in
+        'Red Hat '*) os=RedHat ;;
+        *)           os="${BASH_REMATCH[1]}" ;;
+      esac
+      display_version "$os" "${BASH_REMATCH[2]}"
+      return 0
+    else
+      err "/etc/redhat-release not like: <distro> release <version> (<remark>)"
+    fi
+  fi
+  if which sw_vers &> /dev/null
+  then
+    local product="$(sw_vers -productName)"
+    case "$product" in
+      'Mac OS X') display_version MacOSX "$(sw_vers -productVersion)" ;;
+      *) err "Expecting productName to be 'Mac OS X', not '$product'!";;
+    esac
+    return 0
+  fi
+  err "Could not determine OS version!"
+}
+
+function display_version {
+  local os="$( tr A-Z a-z <<<"$1" )" version="$( tr A-Z a-z <<<"$2" )"
+  case "$os" in
+    redhat|centos|debian) out "$os/${version%%.*}" ;;   # Ignore minor versions
+    macosx)               out "$os/${version%.*}" ;;  # Ignore bug fix releases
+    *)                    out "$os/$version" ;;
+  esac
+}
+
+function msg { out "$*" >&2 ;}
+function err { local x=$? ; msg "$*" ; return $(( $x == 0 ? 1 : $x )) ;}
+function out { printf '%s\n' "$*" ;}
+
+if [[ ${1:-} ]] && declare -F | cut -d' ' -f3 | fgrep -qx -- "${1:-}"
+then "$@"
+else main "$@"
+fi
+
