@@ -62,7 +62,8 @@ function install_tgz {
   pushd "$temp_dir"/marathon*               # path may contain a version string
   bin/build-distribution                            # create the executable jar
   as_root mkdir -p "$install_dir"
-  as_root install -m 0755 target/marathon-runnable.jar "$install_dir"/marathon.jar
+  as_root install -m 0755 target/marathon-runnable.jar \
+                          "$install_dir"/marathon.jar
   as_root rm -rf /opt/marathon
   as_root ln -s "$install_dir" /opt/marathon
   popd
