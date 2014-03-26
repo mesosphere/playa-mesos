@@ -110,7 +110,7 @@ see [Configuration][15] and the [Packer Documentation][20].
 ## Similar Projects
 
 * [vagrant-mesos](https://github.com/everpeace/vagrant-mesos): Vagrant
-  provisiong with multinode and EC2 support
+  provisioning with multinode and EC2 support
 
 ## Authors
 
