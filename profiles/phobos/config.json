@@ -1,0 +1,9 @@
+{
+    "box_name": "playa_mesos_phobos",
+    "box_url": "http://downloads.mesosphere.io/playa-mesos/playa_mesos_phobos.box",
+    "ip_address": "10.141.141.11",
+    "vm_ram": "2048",
+    "vm_cpus": "2",
+    "mesos_deb_url": "http://downloads.mesosphere.io/master/ubuntu/13.10/mesos_0.18.0-rc5_amd64.deb",
+    "marathon_tgz_url": "http://downloads.mesosphere.io/marathon/marathon-0.5.0-SNAPSHOT.tgz"
+}
