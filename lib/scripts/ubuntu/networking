@@ -3,8 +3,8 @@ set -o errexit -o nounset -o pipefail
 
 # Disable persistent network interface rules, they tend to be problematic with
 # VM images where the MAC address of the primary interface can change.
-rm /etc/udev/rules.d/70-persistent-net.rules
-mkdir /etc/udev/rules.d/70-persistent-net.rules
+rm -f /etc/udev/rules.d/70-persistent-net.rules
+mkdir -p /etc/udev/rules.d/70-persistent-net.rules
 rm /lib/udev/rules.d/75-persistent-net-generator.rules
 rm -rf /dev/.udev/
 
