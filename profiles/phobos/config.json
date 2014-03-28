@@ -5,5 +5,5 @@
     "vm_ram": "2048",
     "vm_cpus": "2",
     "mesos_deb_url": "http://downloads.mesosphere.io/master/ubuntu/13.10/mesos_0.18.0-rc5_amd64.deb",
-    "marathon_tgz_url": "http://downloads.mesosphere.io/marathon/marathon-0.5.0-SNAPSHOT.tgz"
+    "marathon_tgz_url": "http://downloads.mesosphere.io/marathon/master/marathon-0.5.0-SNAPSHOT.tgz"
 }
