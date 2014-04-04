@@ -61,19 +61,11 @@ function configure_slave {
 }
 
 function install_with_apt {
-  apt_ curl unzip
-  get_deb
-  as_root env DEBIAN_FRONTEND=noninteractive dpkg -i "${deb_url##*/}"
-  apt_ zookeeperd zookeeper zookeeper-bin
-}
-
-function get_deb {
   global deb_url
-  download=( curl -sSfLO "$deb_url" )
-  if "${download[@]}" 
-  then :
-  else err "${download[@]}" '-$?>' "$?"
-  fi
+  apt_ curl unzip
+  curl_ "$deb_url" --output /tmp/mesos.deb
+  as_root env DEBIAN_FRONTEND=noninteractive dpkg -i /tmp/mesos.deb
+  apt_ zookeeperd zookeeper zookeeper-bin
 }
 
 function deb_url {
@@ -138,6 +130,20 @@ function display_version {
     macosx)               out "$os/${version%.*}" ;;  # Ignore bug fix releases
     *)                    out "$os/$version" ;;
   esac
+}
+
+function curl_ {
+  local stat cmd=( curl -sSfL "$@" )
+  if "${cmd[@]}"
+  then
+    return 0
+  else
+    local stat=$?
+    { printf ': exit %3s ;' "$stat"
+      printf ' %q' "${cmd[@]}"
+      printf '\n' ;} >&2
+    return $stat
+  fi
 }
 
 function msg { out "$*" >&2 ;}
