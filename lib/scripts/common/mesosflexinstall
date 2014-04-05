@@ -63,8 +63,10 @@ function configure_slave {
 function install_with_apt {
   global deb_url
   apt_ curl unzip
-  curl_ "$deb_url" --output /tmp/mesos.deb
-  as_root env DEBIAN_FRONTEND=noninteractive dpkg -i /tmp/mesos.deb
+  local mesosdeb=`mktemp -t mesos.XXXXXX.deb`
+  curl_ "$deb_url" --output "$mesosdeb"
+  as_root env DEBIAN_FRONTEND=noninteractive dpkg -i "$mesosdeb"
+  rm -f "$mesosdeb"
   apt_ zookeeperd zookeeper zookeeper-bin
 }
 
