@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Install docker repository and packages
+# http://docs.docker.io/en/latest/installation/ubuntulinux/
+
+set -o errexit -o nounset -o pipefail
+
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
+echo deb http://get.docker.io/ubuntu docker main > /etc/apt/sources.list.d/docker.list
+apt-get update
+
+# Recommended for AUFS filesystem support
+sudo apt-get install linux-image-extra-`uname -r`
+
+apt-get -y install lxc-docker

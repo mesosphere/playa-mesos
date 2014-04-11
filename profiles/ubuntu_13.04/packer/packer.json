@@ -75,7 +75,8 @@
         "{{user `scripts`}}/common/vagrant",
         "{{user `scripts`}}/common/vmtools",
         "{{user `scripts`}}/ubuntu/python-tools",
-        "{{user `scripts`}}/ubuntu/java"
+        "{{user `scripts`}}/ubuntu/java",
+        "{{user `scripts`}}/ubuntu/docker"
       ],
       "type": "shell"
     },
