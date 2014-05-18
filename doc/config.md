@@ -1,7 +1,7 @@
 # Playa Mesos Configuration
 
 ### config.json
-Each profile has a `config.json` where the following options must be set.
+The following options must be set in `config.json`:
 
 <dl>
   <dt>box_name</dt>

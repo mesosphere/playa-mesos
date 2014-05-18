@@ -29,11 +29,6 @@ cd playa-mesos
 bin/test
 ```
 
-1. Change to the `ubuntu_13.04` profile directory
-```bash
-cd profiles/ubuntu_13.04
-```
-
 1. Start the VM
 ```bash
 vagrant up
@@ -70,11 +65,6 @@ vagrant destroy
 export PATH=$PATH:/path/where/i/extracted/packer/archive/
 ```
 
-1. Change to the `ubuntu_13.04` profile directory
-```bash
-cd profiles/ubuntu_13.04
-```
-
 1. Destroy any existing VM
 ```bash
 vagrant destroy
@@ -82,7 +72,7 @@ vagrant destroy
 
 1. Build the Vagrant box image
 ```bash
-./build
+bin/build
 ```
 
 1. Start the VM using the local box image
@@ -92,12 +82,12 @@ vagrant up
 
 The build is controlled with the following files:
 
-* [profiles/ubuntu_13.04/config.json][21]
-* [profiles/ubuntu_13.04/packer/packer.json][22]
+* [config.json][21]
+* [packer/packer.json][22]
 * [lib/scripts/*][23]
 
-For additional information on customizing the build, or creating a new profile,
-see [Configuration][15] and the [Packer Documentation][20].
+For additional information on customizing the buildi see [Configuration][15]
+and the [Packer Documentation][20].
 
 ## Documentation
 
@@ -134,6 +124,6 @@ see [Configuration][15] and the [Packer Documentation][20].
 [18]: doc/known_issues.md "Known Issues"
 [19]: doc/to_do.md "To Do"
 [20]: http://www.packer.io/docs "Packer Documentation"
-[21]: profiles/ubuntu_13.04/config.json "config.json"
-[22]: profiles/ubuntu_13.04/packer/packer.json "packer.json"
+[21]: config.json "config.json"
+[22]: packer/packer.json "packer.json"
 [23]: lib/scripts "scripts"

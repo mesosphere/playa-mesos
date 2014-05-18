@@ -111,7 +111,7 @@
     "ip_address": null,
     "vm_ram": null,
     "vm_cpus": null,
-    "scripts": "../../../lib/scripts/",
+    "scripts": "../lib/scripts/",
     "marathon_tgz_url": null
   }
 }
