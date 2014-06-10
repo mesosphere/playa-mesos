@@ -3,7 +3,7 @@ set -e
 set -u
 
 function globals(){
-  readonly CONF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  readonly CONF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
   readonly BUILD_ROOT="${CONF_ROOT}/packer"
   readonly PM_CONFIG="${CONF_ROOT}/config.json"
   readonly PACKER_CONFIG="${CONF_ROOT}/packer/packer.json"
