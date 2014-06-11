@@ -4,7 +4,7 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing
 VAGRANTFILE_API_VERSION = '2'
 
-PM_ROOT = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
+PM_ROOT = File.dirname(__FILE__)
 PM_CONFIG = File.expand_path(File.join(File.dirname(__FILE__), 'config.json'))
 require_relative File.join(PM_ROOT, 'lib', 'ruby', 'playa_settings')
 pmconf = PlayaSettings.new(PM_CONFIG)
@@ -48,14 +48,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vb.customize ['modifyvm', :id, '--cpus',   pmconf.vm_cpus]
 
     # Make the project root available to the guest VM.
-    override.vm.synced_folder '../../', '/vagrant'
+    # override.vm.synced_folder '.', '/vagrant'
 
     # Only provision if explicitly request with 'provision' or 'up --provision'
     if ARGV.any? { |arg| arg =~ /^(--)?provision$/ }
       override.vm.provision :shell do |shell|
-        shell.path = '../../lib/scripts/common/mesosflexinstall'
-        arg_array = ['--deb', pmconf.mesos_deb_url,
-                     '--slave-hostname', pmconf.ip_address]
+        shell.path = 'lib/scripts/common/mesosflexinstall'
+        arg_array = ['--slave-hostname', pmconf.ip_address]
         # Using an array for shell args requires Vagrant 1.4.0+
         # TODO: Set as array directly when Vagrant 1.3 support is dropped
         shell.args = arg_array.join(' ')

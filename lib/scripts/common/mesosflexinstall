@@ -2,8 +2,7 @@
 set -o errexit -o nounset -o pipefail
 function -h {
 cat <<USAGE
- USAGE: mesosflexinstall (--deb <URL>)?
-                         (--rel <mesos-version>)?
+ USAGE: mesosflexinstall (--rel <mesos-version>)?
                          (--slave-hostname <SLAVE_HOSTNAME>)?
 
   Install and configure Mesos with Zookeeper support.
@@ -20,8 +19,6 @@ function main {
 
 function globals {
   export LC_ALL=en_US.UTF-8
-  mesos_version=0.15.0-rc4
-  root=http://downloads.mesosphere.io/master
 }; globals
 
 # Calls a function of the same name for each needed variable.
@@ -35,8 +32,7 @@ function options {
   while [[ ${1:+isset} ]]
   do
     case "$1" in
-      --rel)            mesos_version="$2"       ; shift ;;
-      --deb)            deb_url="$2"             ; shift ;; # Overrides default
+      --rel)            rel="$2"                 ; shift ;;
       --slave-hostname) slave_hostname="$2"      ; shift ;; # See: MESOS-825
       --*)              err "No such option: $1" ;;
     esac
@@ -47,7 +43,7 @@ function options {
 function install_mesos {
   global os_release
   case "$os_release" in
-    ubuntu/*|debian/*) install_with_apt ;; 
+    ubuntu/14.04)      install_with_apt "trusty" ;;
     *)                 err "No support for $os_release at this time." ;;
   esac
 }
@@ -60,25 +56,19 @@ function configure_slave {
   fi
 }
 
+function install_apt_source {
+  echo "deb http://repos.mesosphere.io/ubuntu/ $1 main" |
+    as_root tee /etc/apt/sources.list.d/mesosphere.list
+  as_root apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
+  as_root apt-get update
+}
+
 function install_with_apt {
   apt_ curl unzip
-  get_deb
-  as_root env DEBIAN_FRONTEND=noninteractive dpkg -i "${deb_url##*/}"
-  apt_ zookeeperd zookeeper zookeeper-bin
-}
-
-function get_deb {
-  global deb_url
-  download=( curl -sSfLO "$deb_url" )
-  if "${download[@]}" 
-  then :
-  else err "${download[@]}" '-$?>' "$?"
-  fi
-}
-
-function deb_url {
-  global os_release
-  out "$root"/"$os_release"/mesos_"$mesos_version"_amd64.deb
+  install_apt_source $1
+  apt_ zookeeperd zookeeper zookeeper-bin docker.io mesos marathon deimos
+  as_root ln -sf /usr/bin/docker.io /usr/local/bin/docker
+  as_root sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
 }
 
 function apt_ {
