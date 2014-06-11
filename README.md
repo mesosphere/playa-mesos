@@ -19,66 +19,76 @@ convenience, but it can also be built from source using [Packer][9].
 1. [Install Vagrant](http://www.vagrantup.com/downloads.html)
 
 1. Clone this repository
-```bash
-git clone https://github.com/mesosphere/playa-mesos.git
-cd playa-mesos
-```
+
+  ```bash
+  git clone https://github.com/mesosphere/playa-mesos.git
+  cd playa-mesos
+  ```
 
 1. Make sure tests pass
-```bash
-bin/test
-```
+
+  ```bash
+  bin/test
+  ```
 
 1. Start the VM
-```bash
-vagrant up
-```
+
+  ```bash
+  vagrant up
+  ```
 
 1. Connect to the Mesos Web UI on [10.141.141.10:5050](http://10.141.141.10:5050)
 
 1. SSH to the VM
-```bash
-vagrant ssh
-ps -eaf | grep mesos
-exit
-```
+
+  ```bash
+  vagrant ssh
+  ps -eaf | grep mesos
+  exit
+  ```
 
 1. Halt the VM
-```bash
-vagrant halt
-```
+
+  ```bash
+  vagrant halt
+  ```
 
 1. Destroy the VM
-```bash
-vagrant destroy
-```
+
+  ```bash
+  vagrant destroy
+  ```
 
 ## Building the Mesos box image (optional)
 
 1. Install [Packer][9]
 
-    Installing Packer is not completely automatic. Once you have downloaded and
-    extracted Packer, you must update your search path so that the `packer`
-    executable can be found.
-```bash
-# EXAMPLE - PACKER LOCATION MUST BE ADJUSTED
-export PATH=$PATH:/path/where/i/extracted/packer/archive/
-```
+  Installing Packer is not completely automatic. Once you have downloaded and
+  extracted Packer, you must update your search path so that the `packer`
+  executable can be found.
+
+  ```bash
+  # EXAMPLE - PACKER LOCATION MUST BE ADJUSTED
+  export PATH=$PATH:/path/where/i/extracted/packer/archive/
+  ```
 
 1. Destroy any existing VM
-```bash
-vagrant destroy
-```
+
+  ```bash
+  vagrant destroy
+  ```
 
 1. Build the Vagrant box image
-```bash
-bin/build
-```
+
+  ```bash
+  bin/build
+  ```
 
 1. Start the VM using the local box image
-```bash
-vagrant up
-```
+
+  ```bash
+  vagrant up
+  ```
 
 The build is controlled with the following files:
 
