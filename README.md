@@ -2,7 +2,7 @@
 
 [Playa Mesos][8] helps you quickly create [Apache Mesos][1] test environments.
 This project relies on [VirtualBox][5], [Vagrant][6], and an Ubuntu box image
-which has Mesos pre-installed. The box image is downloadable for your
+which has Mesos and [Marathon][2] pre-installed. The box image is downloadable for your
 convenience, but it can also be built from source using [Packer][9].
 
 ## Requirements
@@ -37,7 +37,7 @@ convenience, but it can also be built from source using [Packer][9].
   vagrant up
   ```
 
-1. Connect to the Mesos Web UI on [10.141.141.10:5050](http://10.141.141.10:5050)
+1. Connect to the Mesos Web UI on [10.141.141.10:5050](http://10.141.141.10:5050) and the Marathon Web UI on [10.141.141.10:8080](http://10.141.141.10:8080)
 
 1. SSH to the VM
 
