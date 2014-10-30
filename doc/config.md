@@ -4,11 +4,15 @@
 The following options must be set in `config.json`:
 
 <dl>
+  <dt>platform</dt>
+  <dd>Virtualization platform (possible choices are: ```virtualbox```, ```vmware_fusion```, ```vmware_workstation```)</dd>
+
   <dt>box_name</dt>
   <dd>Vagrant box-name</dd>
 
-  <dt>box_url</dt>
-  <dd>URL where the Vagrant box image can be downloaded</dd>
+  <dt>base_url</dt>
+  <dd>Base URL where the Vagrant box images are stored.</dd>
+  <dd>Download path is dynamically extracted with this schema: ```base_url```/```platform```/```box_name```.box</dd>
 
   <dt>ip_address</dt>
   <dd>IP address used by the VM on a private network using a /24 netmask</dd>

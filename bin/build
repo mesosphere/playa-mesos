@@ -6,7 +6,8 @@ function globals(){
   readonly CONF_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
   readonly BUILD_ROOT="${CONF_ROOT}/packer"
   readonly PM_CONFIG="${CONF_ROOT}/config.json"
-  readonly PACKER_CONFIG="${CONF_ROOT}/packer/packer.json"
+  readonly PLATFORM=$(cat "$PM_CONFIG"|python -c 'import json,sys;obj=json.load(sys.stdin);print obj["platform"]')
+  readonly PACKER_CONFIG="${CONF_ROOT}/packer/packer-${PLATFORM}.json"
 }
 
 function prereqs(){

@@ -73,7 +73,7 @@
         "{{user `scripts`}}/ubuntu/networking",
         "{{user `scripts`}}/ubuntu/sudoers",
         "{{user `scripts`}}/common/vagrant",
-        "{{user `scripts`}}/common/vmtools",
+        "{{user `scripts`}}/common/vmtools-virtualbox",
         "{{user `scripts`}}/ubuntu/python-tools",
         "{{user `scripts`}}/ubuntu/java"
       ],
@@ -96,9 +96,10 @@
     }
   ],
   "variables": {
+    "platform": null,
     "mirror": "http://releases.ubuntu.com",
     "box_name": null,
-    "box_url": null,
+    "base_url": null,
     "ip_address": null,
     "vm_ram": null,
     "vm_cpus": null,

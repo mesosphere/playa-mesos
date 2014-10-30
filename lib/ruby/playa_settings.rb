@@ -45,7 +45,7 @@ class PlayaSettings
 
   # Return the last part of the box_url path (the box filename)
   def box_filename
-    URI(box_url).path.split('/').last
+    box_name + '.box'
   end
 
   # Return the local filesystem path of the box specified by #box_url if it can
