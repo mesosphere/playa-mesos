@@ -9,7 +9,7 @@ PM_CONFIG = File.expand_path(File.join(File.dirname(__FILE__), 'config.json'))
 require_relative File.join(PM_ROOT, 'lib', 'ruby', 'playa_settings')
 pmconf = PlayaSettings.new(PM_CONFIG)
 
-box_url = "#{pmconf.base_url}/#{pmconf.platform}/#{pmconf.box_name}.box"
+box_url = "#{pmconf.base_url}/#{pmconf.box_name}-#{pmconf.platform}.box"
 
 # #############################################################################
 # Vagrant VM Definitions

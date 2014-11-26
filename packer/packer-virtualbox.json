@@ -60,7 +60,7 @@
   ],
   "post-processors": [
     {
-      "output": "builds/{{user `box_name`}}.box",
+      "output": "builds/{{user `box_name`}}-{{user `platform`}}.box",
       "type": "vagrant"
     }
   ],
