@@ -34,7 +34,7 @@ class PlayaSettings
 
   # Aborts (exit with failure code) if URI is invalid
   def box_url
-    url = @settings['box_url']
+    url = @settings['base_url']
     begin
       URI(url) if url
     rescue URI::Error => e
@@ -45,7 +45,7 @@ class PlayaSettings
 
   # Return the last part of the box_url path (the box filename)
   def box_filename
-    URI(box_url).path.split('/').last
+    box_name + '-' + platform + '.box'
   end
 
   # Return the local filesystem path of the box specified by #box_url if it can
