@@ -5,12 +5,17 @@ This project relies on [VirtualBox][5], [Vagrant][6], and an Ubuntu box image
 which has Mesos and [Marathon][2] pre-installed. The box image is downloadable for your
 convenience, but it can also be built from source using [Packer][9].
 
+As an alternative to VirtualBox, it's possible to build and run the image on
+VMware [Fusion](https://www.vmware.com/products/fusion/) or [Workstation](https://www.vmware.com/products/workstation/).
+
 ## Requirements
 
 * [VirtualBox][5] 4.2+
 * [Vagrant][6] 1.3+
 * [git](http://git-scm.com/downloads) (command line tool)
 * [Packer][9] 0.5+ (optional)
+* VMware [Fusion](https://www.vmware.com/products/fusion/) or [Workstation](https://www.vmware.com/products/workstation/) (optional)
+* [Vagrant Plugin for VMware Fusion or Workstation](https://www.vagrantup.com/vmware) (optional)
 
 ## Quick Start
 
@@ -116,6 +121,9 @@ see [Configuration][15] and the [Packer Documentation][20].
 
 * [Jeremy Lingmann](https://github.com/lingmann) ([@lingmann](https://twitter.com/lingmann))
 * [Jason Dusek](https://github.com/solidsnack) ([@solidsnack](https://twitter.com/solidsnack))
+
+VMware Support: [Fabio Rapposelli](https://github.com/frapposelli) ([@fabiorapposelli](https://twitter.com/fabiorapposelli))
+
 
 [1]: http://incubator.apache.org/mesos/ "Apache Mesos"
 [2]: http://github.com/mesosphere/marathon "Marathon"

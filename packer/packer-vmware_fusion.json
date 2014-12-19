@@ -27,8 +27,8 @@
       ],
       "boot_wait": "10s",
       "disk_size": 40960,
-      "guest_additions_path": "VBoxGuestAdditions_{{.Version}}.iso",
-      "guest_os_type": "Ubuntu_64",
+      "tools_upload_flavor": "linux",
+      "guest_os_type": "ubuntu-64",
       "http_directory": "http",
       "iso_checksum": "ababb88a492e08759fddcf4f05e5ccc58ec9d47fa37550d63931d0a5fa4f7388",
       "iso_checksum_type": "sha256",
@@ -39,28 +39,18 @@
       "ssh_port": 22,
       "ssh_username": "vagrant",
       "ssh_wait_timeout": "10000s",
-      "type": "virtualbox-iso",
-      "vboxmanage": [
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--memory",
-          "384"
-        ],
-        [
-          "modifyvm",
-          "{{.Name}}",
-          "--cpus",
-          "1"
-        ]
-      ],
-      "virtualbox_version_file": ".vbox_version",
+      "headless": true,
+      "type": "vmware-iso",
+      "vmx_data": {
+        "memsize": "384",
+        "numvcpus": "1"
+      },
       "vm_name": "packer-{{user `box_name`}}"
     }
   ],
   "post-processors": [
     {
-      "output": "builds/{{user `box_name`}}.box",
+      "output": "builds/{{user `box_name`}}-{{user `platform`}}.box",
       "type": "vagrant"
     }
   ],
@@ -73,7 +63,7 @@
         "{{user `scripts`}}/ubuntu/networking",
         "{{user `scripts`}}/ubuntu/sudoers",
         "{{user `scripts`}}/common/vagrant",
-        "{{user `scripts`}}/common/vmtools",
+        "{{user `scripts`}}/common/vmtools-vmware",
         "{{user `scripts`}}/ubuntu/python-tools",
         "{{user `scripts`}}/ubuntu/java"
       ],
@@ -96,9 +86,10 @@
     }
   ],
   "variables": {
+    "platform": null,
     "mirror": "http://releases.ubuntu.com",
     "box_name": null,
-    "box_url": null,
+    "base_url": null,
     "ip_address": null,
     "vm_ram": null,
     "vm_cpus": null,
