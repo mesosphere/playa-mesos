@@ -53,6 +53,8 @@ function configure_slave {
   then
     mkdir -p /etc/mesos-slave
     echo "$slave_hostname" > /etc/mesos-slave/hostname
+    echo "docker,mesos" > /etc/mesos-slave/containerizers
+    echo "5mins" > /etc/mesos-slave/executor_registration_timeout
   fi
 }
 
