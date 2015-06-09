@@ -68,7 +68,7 @@ function install_apt_source {
 function install_with_apt {
   apt_ curl unzip
   install_apt_source $1
-  apt_ zookeeperd zookeeper zookeeper-bin docker.io mesos marathon deimos
+  apt_ zookeeperd zookeeper zookeeper-bin docker.io mesos marathon chronos
   as_root ln -sf /usr/bin/docker.io /usr/local/bin/docker
   as_root sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
 }
