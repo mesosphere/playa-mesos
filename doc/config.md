@@ -16,6 +16,11 @@ Download path is dynamically extracted with this schema: `base_url`/`platform`/`
 ###### _*ip_address*_
 IP address used by the VM on a private network using a /24 netmask
 
+###### _*mesos_release*_
+Optional configuration parameter to install a specific version of Mesos. This
+should be the full string as returned by `apt-cache policy mesos`. For example:
+`0.22.1-1.0.ubuntu1404`.
+
 ###### _*vm_ram*_
 MB of RAM allocated to the VM
 

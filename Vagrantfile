@@ -67,6 +67,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.provision :shell do |shell|
       shell.path = 'lib/scripts/common/mesosflexinstall'
       arg_array = ['--slave-hostname', pmconf.ip_address]
+
+      # If mesos_release exists in the config.json file, pass the '--rel'
+      # argument and a version to mesosflexinstall. Otherwise, do nothing.
+      if pmconf.instance_variable_get(:@settings).include?('mesos_release')
+        arg_array += ['--rel', pmconf.mesos_release]
+      end
+
       # Using an array for shell args requires Vagrant 1.4.0+
       # TODO: Set as array directly when Vagrant 1.3 support is dropped
       shell.args = arg_array.join(' ')
