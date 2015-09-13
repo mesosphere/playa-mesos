@@ -68,9 +68,21 @@ function install_apt_source {
 function install_with_apt {
   apt_ curl unzip
   install_apt_source $1
-  apt_ zookeeperd zookeeper zookeeper-bin docker.io mesos marathon chronos
-  as_root ln -sf /usr/bin/docker.io /usr/local/bin/docker
-  as_root sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io
+  install_docker
+  apt_ zookeeperd zookeeper zookeeper-bin mesos marathon chronos
+  as_root sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker
+  restart_services
+}
+
+function install_docker {
+  as_root curl -sSL https://get.docker.com/ | sh
+}
+
+function restart_services {
+  as_root service marathon restart
+  as_root service chronos restart
+  as_root service mesos-slave restart
+  as_root service mesos-master restart
 }
 
 function apt_ {
