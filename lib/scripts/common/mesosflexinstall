@@ -66,10 +66,12 @@ function install_apt_source {
 }
 
 function install_with_apt {
+  [[ ! -z ${rel-''} ]] && mesos_rel="mesos=${rel}" || mesos_rel="mesos"
+
   apt_ curl unzip
   install_apt_source $1
   install_docker
-  apt_ zookeeperd zookeeper zookeeper-bin mesos marathon chronos
+  apt_ zookeeperd zookeeper zookeeper-bin $mesos_rel marathon chronos
   as_root sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker
   restart_services
 }
