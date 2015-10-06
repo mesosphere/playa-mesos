@@ -61,8 +61,10 @@ function configure_slave {
 function install_apt_source {
   echo "deb http://repos.mesosphere.io/ubuntu/ $1 main" |
     as_root tee /etc/apt/sources.list.d/mesosphere.list
+  as_root apt-get install -y software-properties-common
   as_root apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
-  as_root apt-get update
+  as_root add-apt-repository ppa:webupd8team/java
+  as_root apt-get update -y
 }
 
 function install_with_apt {
@@ -71,6 +73,9 @@ function install_with_apt {
   apt_ curl unzip
   install_apt_source $1
   install_docker
+  as_root echo debconf shared/accepted-oracle-license-v1-1 select true | as_root debconf-set-selections
+  as_root echo debconf shared/accepted-oracle-license-v1-1 seen true | as_root debconf-set-selections
+  as_root apt-get install -y --force-yes oracle-java8-installer oracle-java8-set-default
   apt_ zookeeperd zookeeper zookeeper-bin $mesos_rel marathon chronos
   as_root sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker
   restart_services
