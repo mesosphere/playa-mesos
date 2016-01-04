@@ -116,6 +116,7 @@ see [Configuration][15] and the [Packer Documentation][20].
 
 * [vagrant-mesos](https://github.com/everpeace/vagrant-mesos): Vagrant
   provisioning with multinode and EC2 support
+* [babushka-mesos](https://github.com/parolkar/mesos-babushka): It is [Babushka](http://babushka.me/) based provisioning of Mesos Cluster which can help you demonstrate [potential](http://vimeo.com/110914075) of mesos. 
 
 ## Authors
 
