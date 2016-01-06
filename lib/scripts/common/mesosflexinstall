@@ -78,11 +78,19 @@ function install_with_apt {
   as_root apt-get install -y --force-yes oracle-java8-installer oracle-java8-set-default
   apt_ zookeeperd zookeeper zookeeper-bin $mesos_rel marathon chronos
   as_root sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker
+  install_haproxy
   restart_services
 }
 
 function install_docker {
   as_root curl -sSL https://get.docker.com/ | sh
+}
+
+function install_haproxy {
+  apt_ haproxy
+  curl -sSL "https://raw.githubusercontent.com/mesosphere/marathon/master/bin/haproxy-marathon-bridge"| as_root tee /usr/bin/haproxy-marathon-bridge
+  as_root chmod +x /usr/bin/haproxy-marathon-bridge
+  as_root /usr/bin/haproxy-marathon-bridge install_haproxy_system localhost:8080
 }
 
 function restart_services {
