@@ -88,7 +88,7 @@ function install_docker {
 
 function install_haproxy {
   apt_ haproxy
-  curl -sSL "https://raw.githubusercontent.com/mesosphere/marathon/master/bin/haproxy-marathon-bridge"| as_root tee /usr/bin/haproxy-marathon-bridge
+  curl -sSL "https://raw.githubusercontent.com/mesosphere/marathon/master/examples/haproxy-marathon-bridge"| as_root tee /usr/bin/haproxy-marathon-bridge
   as_root chmod +x /usr/bin/haproxy-marathon-bridge
   as_root /usr/bin/haproxy-marathon-bridge install_haproxy_system localhost:8080
 }
