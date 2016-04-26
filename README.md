@@ -1,3 +1,11 @@
+___
+
+**DEPRECATED** This project is no longer actively maintained. Please see [DC/OS
+Vagrant](https://github.com/dcos/dcos-vagrant) for all your Mesos test
+environment needs.
+
+___
+
 # Playa Mesos
 
 [Playa Mesos][8] helps you quickly create [Apache Mesos][1] test environments.
